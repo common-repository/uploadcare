@@ -1,0 +1,66 @@
+{% extends 'layout.html.twig' %}
+
+{% block body %}
+    <h2>
+        {{ 'Transfer files to Uploadcare' | trans }}
+        <small class="text-small text-black-50">{{ 'and back' | trans }}</small>
+    </h2>
+    <div class="text-start">
+        <button id="uploadAll" class="btn btn-outline-primary rounded-0">{{ 'Transfer all files to Uploadcare' | trans }}</button>
+        <button id="downloadAll" class="btn btn-outline-secondary rounded-0">{{ 'Transfer all files from Uploadcare' | trans }}</button>
+        <p class="mt-2">
+            {{ 'It\'ll tranfer files in bulk. Don\'t close this tab until transfer is complete.' | trans }}<br>
+            {{ 'Only files on <strong>this</strong> page will be transferred. Switch pages to transfer another files.' | trans | raw }}<br>
+            {% include '_includes/console_utility_link.html.twig' %}
+        </p>
+    </div>
+    <div class="alert alert-danger hidden" id="uc-error-place"></div>
+    <div class="progress rounded-0" id="transferProgress">
+        <div class="progress-bar bg-success" role="progressbar" style="width: 0"></div>
+    </div>
+    <hr>
+
+    <div class="table-responsive">
+        <p>{{ 'Files in Media Library' | trans }}: {{ localCount }}. {{ 'Files on Uploadcare' | trans }}: {{ remoteCount }}.</p>
+        <table class="table table-striped align-middle">
+            <thead>
+            <tr>
+                <th>{{ 'Preview' | trans }}</th>
+                <th>{{ 'Media data' | trans }}</th>
+                <th class="text-center">{{ 'Transferred' | trans }}</th>
+                <th class="text-center">{{ 'Actions' | trans }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for post in media %}
+                {% include '_includes/_table_row.html.twig' with { 'post': post } %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if pagesCount > 1 %}
+    <nav aria-label="Pagination" class="mw-100 overflow-scroll">
+        <ul class="pagination">
+            {% for n in 1..pagesCount %}
+                <li class="page-item {{ n == page ? 'active' : null }}">
+                    {% if n == page %}
+                        <span class="page-link">{{ n }}</span>
+                    {% else %}
+                        <a class="page-link" href="?page=uploadcare-transfer&page_number={{ n }}">{{ n }}</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+    {% endif %}
+    <p class="alert alert-primary rounded-0" role="alert">
+        Before deactivating the plugin, you should download all images to avoid them being displayed incorrectly.
+    </p>
+    <p class="alert alert-secondary rounded-0" role="alert">
+        All image source URLs will be updated in all existing posts & pages automatically, so images are optimized and delivered with Uploadcare CDN.
+    </p>
+{% endblock %}
+
+{% block javascripts %}
+    {{ add_js('transfer.js') }}
+{% endblock %}
